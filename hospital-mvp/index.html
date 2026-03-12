@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare | Hospital MVP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav class="navbar glass">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i> MediCare
+        </div>
+        <div class="nav-links">
+            <div class="notification-wrapper">
+                <i class="fas fa-bell notification-icon"></i>
+                <span class="notification-badge hidden" id="notification-count">0</span>
+                <div class="notification-dropdown glass hidden" id="notification-dropdown">
+                    <h4>Notifications</h4>
+                    <ul id="notification-list"></ul>
+                </div>
+            </div>
+            <button class="nav-btn active" id="btn-patient-view">Book Appointment</button>
+            <button class="nav-btn" id="btn-doctor-view">Doctor Portal</button>
+            <button class="nav-btn" id="btn-manager-view">Manager Portal</button>
+            <button class="nav-btn" id="btn-map-view">Hospital Map</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Patient View: Directory & Booking -->
+        <section id="patient-view" class="view-section active">
+            <header class="section-header">
+                <h1>Find Your Specialist</h1>
+                <p>Book an appointment with our top healthcare professionals today.</p>
+                <div class="search-bar glass">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="doctor-search" placeholder="Search by name or specialty...">
+                </div>
+            </header>
+
+            <div class="doctor-grid" id="doctor-list">
+                <!-- Doctor Cards dynamically injected here -->
+            </div>
+        </section>
+
+        <!-- Booking Modal -->
+        <div id="booking-modal" class="modal">
+            <div class="modal-content glass">
+                <span class="close-modal">&times;</span>
+                <h2 id="modal-doctor-name">Book Appointment</h2>
+                <p class="modal-subtitle" id="modal-doctor-specialty"></p>
+                
+                <form id="booking-form">
+                    <div class="form-group">
+                        <label for="patient-name">Your Name</label>
+                        <input type="text" id="patient-name" required placeholder="John Doe">
+                    </div>
+
+                    <!-- Digital Triage Section -->
+                    <div class="form-group triage-section">
+                        <label for="primary-symptom">Primary Symptom / Reason</label>
+                        <select id="primary-symptom" class="form-control" required>
+                            <option value="">Select a symptom...</option>
+                            <option value="General Checkup">General Checkup</option>
+                            <option value="Chest Pain">Chest Pain</option>
+                            <option value="Fever">Fever</option>
+                            <option value="Headache">Headache</option>
+                            <option value="Toothache">Toothache</option>
+                        </select>
+                    </div>
+
+                    <div id="dynamic-triage-container" class="hidden triage-section-extended">
+                        <!-- Triage questions injected here via JS -->
+                    </div>
+                    <!-- / Digital Triage Section -->
+                    
+                    <div class="form-group">
+                        <label for="appointment-date">Select Date</label>
+                        <input type="date" id="appointment-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Time Slot</label>
+                        <div class="time-slots" id="time-slots">
+                            <!-- Time slots injected here -->
+                        </div>
+                        <input type="hidden" id="selected-time" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Doctor Portal View -->
+        <section id="doctor-view" class="view-section hidden">
+            <!-- Login Screen -->
+            <div id="login-screen" class="glass login-container">
+                <div class="login-header">
+                    <i class="fas fa-user-md login-icon"></i>
+                    <h2>Doctor Portal</h2>
+                    <p>Enter your credentials to manage schedule</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="doc-id">Doctor ID</label>
+                        <input type="text" id="doc-id" required placeholder="Enter ID (e.g., DOC123)">
+                    </div>
+                    <div class="form-group">
+                        <label for="doc-pass">Password</label>
+                        <input type="password" id="doc-pass" required placeholder="Enter Password (e.g., pass123)">
+                    </div>
+                    <button type="submit" class="btn-primary w-100">Login</button>
+                </form>
+            </div>
+
+            <!-- Doctor Dashboard -->
+            <div id="doctor-dashboard" class="hidden">
+                <header class="dashboard-header glass">
+                    <div class="doc-info">
+                        <h2>Welcome, <span id="dash-doc-name">Dr. Name</span></h2>
+                        <p>Room: <span id="dash-doc-room"></span> | Schedule: <span id="dash-doc-schedule"></span></p>
+                    </div>
+                    <button id="btn-logout" class="btn-secondary">Logout</button>
+                </header>
+
+                <div class="dashboard-content">
+                    <div class="appointments-panel glass">
+                        <h3>Today's Appointments</h3>
+                        <div class="filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="Pending">Pending</button>
+                            <button class="filter-btn" data-filter="Accepted">Accepted</button>
+                        </div>
+                        <ul class="appointment-list" id="appointment-list">
+                            <!-- Appointments injected here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manager Dashboard View -->
+        <section id="manager-view" class="view-section hidden">
+            <div class="dashboard-header glass" style="margin-bottom: 2rem;">
+                <h2>Manager Dashboard</h2>
+                <p>Hospital Overview & Statistics</p>
+            </div>
+            
+            <div class="manager-grid" id="manager-stats">
+                <!-- Stat cards injected here -->
+            </div>
+
+            <!-- Smart Operations: Facility Management & 3D Map Admin -->
+            <div class="glass" style="margin-top: 2rem; padding: 1.5rem; border-left: 4px solid var(--secondary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3><i class="fas fa-map-marked-alt" style="color: var(--secondary-color);"></i> Facility Management</h3>
+                </div>
+                <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Update room names or mark corridors for maintenance. The 3D map routes will automatically adjust.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    
+                    <!-- Nodes Admin -->
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:0.5rem;">Rooms & Central Nodes</h4>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size:0.9rem;">
+                                <tbody id="manager-map-nodes">
+                                    <!-- Injected Node Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Edges/Corridors Admin -->
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:0.5rem;">Corridors & Hallways</h4>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size:0.9rem;">
+                                <tbody id="manager-map-edges">
+                                    <!-- Injected Edge Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Operations: Triage Admin -->
+            <div class="glass" style="margin-top: 2rem; padding: 1.5rem; border-left: 4px solid var(--accent-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3><i class="fas fa-clipboard-list" style="color: var(--accent-color);"></i> Dynamic Triage Editor</h3>
+                    <button class="btn-secondary" id="btn-add-triage"><i class="fas fa-plus"></i> Add Question</button>
+                </div>
+                <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Modify the pre-screening questions patients answer during booking.</p>
+                <ul class="appointment-list" id="manager-triage-list">
+                    <!-- Triage questions injected here -->
+                </ul>
+            </div>
+
+            <!-- Smart Operations: Global Appointment Override -->
+            <div class="glass" style="margin-top: 2rem; padding: 1.5rem; border-left: 4px solid var(--primary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3><i class="fas fa-calendar-check" style="color: var(--primary-color);"></i> Master Appointment Control</h3>
+                    <p class="text-muted" style="margin:0;">Override & Approval Workflow Queue</p>
+                </div>
+                <div class="filters" style="margin-bottom: 1rem;">
+                    <button class="filter-btn active" data-mgr-filter="all" onclick="handleManagerAptFilter(event)">All Appointments</button>
+                    <button class="filter-btn" data-mgr-filter="ChangeRequested" onclick="handleManagerAptFilter(event)">Pending Doctor Requests <span id="mgr-req-badge" style="background:#ef4444; color:white; padding: 2px 6px; border-radius: 12px; font-size:0.7rem;">0</span></button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;" class="manager-table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 1rem; color: var(--text-muted);">Patient</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Doctor</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Date & Time</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Status</th>
+                                <th style="padding: 1rem; color: var(--text-muted); text-align: right;">Master Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manager-appt-list">
+                            <!-- Injected rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- God Mode: Doctor Management -->
+            <div class="glass" style="margin-top: 2rem; padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3>Doctor Management</h3>
+                    <button class="btn-primary" id="btn-add-doctor"><i class="fas fa-plus"></i> Add New Doctor</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;" class="manager-table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 1rem; color: var(--text-muted);">Name</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Specialty</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Room</th>
+                                <th style="padding: 1rem; color: var(--text-muted);">Working Hours</th>
+                                <th style="padding: 1rem; color: var(--text-muted); text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manager-doctor-list">
+                            <!-- Injected rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Doctor CRUD Modal -->
+        <div id="doctor-crud-modal" class="modal">
+            <div class="modal-content glass" style="max-height: 90vh; overflow-y: auto;">
+                <span class="close-modal" id="close-doc-modal">&times;</span>
+                <h2 id="doc-modal-title">Add New Doctor</h2>
+                <p class="modal-subtitle">Manage doctor profile and scheduling</p>
+                
+                <form id="doctor-crud-form">
+                    <input type="hidden" id="crud-doc-id">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="crud-doc-name">Full Name</label>
+                            <input type="text" id="crud-doc-name" required placeholder="Dr. First Last">
+                        </div>
+                        <div class="form-group">
+                            <label for="crud-doc-specialty">Specialty</label>
+                            <input type="text" id="crud-doc-specialty" required placeholder="E.g., Cardiologist">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="crud-doc-education">Education</label>
+                            <input type="text" id="crud-doc-education" required placeholder="E.g., MD, Cardiology">
+                        </div>
+                        <div class="form-group">
+                            <label for="crud-doc-room">Room Number</label>
+                            <input type="text" id="crud-doc-room" required placeholder="E.g., 101A">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="crud-doc-skills">Skills / Services</label>
+                        <input type="text" id="crud-doc-skills" required placeholder="Comma separated...">
+                    </div>
+
+                    <div class="form-group" style="border: 1px solid rgba(79, 70, 229, 0.3); padding: 1rem; border-radius: 8px; background: rgba(0,0,0,0.2);">
+                        <label for="crud-doc-schedule"><i class="fas fa-clock" style="color: var(--primary-color);"></i> Master Working Hours</label>
+                        <p class="text-muted" style="margin-bottom: 0.5rem; font-size: 0.85rem;">Override doctor's available schedule globally.</p>
+                        <input type="text" id="crud-doc-schedule" required placeholder="E.g., Mon-Fri 9AM-5PM">
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save Doctor</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Triage Question CRUD Modal -->
+        <div id="triage-crud-modal" class="modal">
+            <div class="modal-content glass">
+                <span class="close-modal" id="close-triage-modal">&times;</span>
+                <h2 id="triage-modal-title">Edit Triage Question</h2>
+                <form id="triage-crud-form">
+                    <input type="hidden" id="crud-triage-id">
+                    <div class="form-group">
+                        <label for="crud-triage-text">Question Prompt</label>
+                        <input type="text" id="crud-triage-text" required placeholder="E.g., Are you taking medications?">
+                    </div>
+                    <div class="form-group">
+                        <label for="crud-triage-type">Input Type</label>
+                        <select id="crud-triage-type" class="form-control">
+                            <option value="Text">Text Answer</option>
+                            <option value="Number">Number Format</option>
+                            <option value="Select">Dropdown Select</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="triage-options-group" class="hidden">
+                        <label for="crud-triage-options">Options (Comma Separated)</label>
+                        <input type="text" id="crud-triage-options" placeholder="Option 1, Option 2, Option 3">
+                        <small class="text-muted">Only required for Dropdown Select type.</small>
+                    </div>
+                    <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save Question</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Map View -->
+        <section id="map-view" class="view-section hidden">
+            <div class="dashboard-header glass" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2>Hospital Wayfinding</h2>
+                    <p>Find your way to your appointment</p>
+                </div>
+                <div class="search-bar glass" style="margin: 0; max-width: none; flex: 1; min-width: 300px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="room-search" placeholder="Enter Room (e.g. 302C)">
+                    <button id="btn-find-path" class="btn-primary" style="margin: 0; padding: 0.5rem 1rem; width: auto; min-width: 120px;">Find Path</button>
+                    <button id="btn-toggle-voice" class="btn-secondary" style="margin-left: 1rem; padding: 0.5rem 1rem; height: 100%;"><i class="fas fa-volume-mute"></i> Voice Off</button>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <div class="glass" style="flex: 1; min-width: 300px; padding: 1.5rem; border-top: 4px solid var(--primary-color);">
+                    <h3 style="margin-bottom: 1rem; color: var(--secondary-color);"><i class="fas fa-directions"></i> Turn-by-Turn Directions</h3>
+                    <ul id="directions-list" style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+                        <li class="text-muted"><i class="fas fa-info-circle"></i> Enter a room number to see directions from the main entrance.</li>
+                    </ul>
+                </div>
+                <div class="glass" style="flex: 2; min-width: 400px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div class="map-container" style="transform: scale(0.8);">
+                        <div class="map-floor" id="map-floor">
+                            <!-- SVG dynamically injected here via JS -->
+                            <svg class="map-path" id="map-path-svg"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast glass"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
